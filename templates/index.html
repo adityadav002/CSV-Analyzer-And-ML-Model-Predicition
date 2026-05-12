@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Loader</title>
+  </head>
+  <body>
+    <h1>Select Dataset</h1>
+    <hr />
+    <form method="POST">
+      <select name="dataset">
+        {% for file in files %}
+        <option value="{{ file }}">{{ file }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Load Dataset</button>
+    </form>
+    <br />
+    {% if table %} {{ table | safe }} {% endif %}
+    <br />
+    <hr />
+    <h1>Dataset Description</h1>
+    {% if description %} {{ description | safe }} {% endif %}
+
+    <hr />
+    <h1>Dataset Info</h1>
+    {% if rows is not none and cols is not none %}
+    <p><strong>Rows:</strong> {{ rows }}</p>
+    <p><strong>Columns:</strong> {{ cols }}</p>
+    {% endif %}
+    <hr />
+    <h1>Column Data Types</h1>
+    {% if dtypes %} {{ dtypes | safe }} {% endif %}
+
+    <br />
+    <hr />
+    <h2>Numerical Columns</h2>
+    {% if numerical_table %} {{ numerical_table | safe }}
+    <br />
+    <h4>Statistics</h4>
+    {{ numerical_desc | safe }} {% endif %}
+
+    <br />
+    <hr />
+    <h2>Categorical Columns</h2>
+
+    {% if categorical_table %} {{ categorical_table | safe }}
+    <br />
+    <h4>Details</h4>
+    {{ categorical_desc | safe }} {% endif %}
+
+    <br />
+    <hr />
+    <h2>Outlier Report</h2>
+    {% if outlier_report %}
+      <ul>
+        {% for report in outlier_report %}
+          <li>{{ report }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No significant outliers found.</p>
+    {% endif %}
+
+    <br />
+    <hr>
+    <h2>Correlation Report</h2>
+    {% if correlation_report %}
+      <ul>
+        {% for report in correlation_report %}
+          <li>{{ report }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No significant correlations found.</p>
+    {% endif %}
+
+    <br>
+    <hr>
+    <h2>Visualizations</h2>
+    {% for plot in plot_paths %}
+    <img
+      src="{{ url_for('static', filename=plot) }}"
+      width="700"
+      class="mb-4"
+    />
+    {% endfor %}
+  </body>
+</html>

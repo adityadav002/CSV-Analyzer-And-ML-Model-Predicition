@@ -1,0 +1,11 @@
+email_id,sender,subject,email_text,contains_link,contains_offer,email_length,spam
+e001,offerscheapdealscom,win a free iphone,congratulations you won a free iphone click here to claim,yes,yes,120,spam
+e002,hrcompanycom,interview schedule,your interview is scheduled for tomorrow at 10 am,no,no,85,not spam
+e003,lotterywinnercom,claim your prize,you have won 5 million dollars reply now,yes,yes,110,spam
+e004,friendgmailcom,lunch tomorrow,hey are we still meeting for lunch tomorrow,no,no,60,not spam
+e005,salesshopnowcom,limited time offer,buy one get one free offer expires tonight,yes,yes,95,spam
+e006,supportbankcom,account verification,please verify your account information securely,yes,no,105,not spam
+e007,promodealscom,cheap loans available,get instant loans with low interest apply today,yes,yes,125,spam
+e008,teacherschoolcom,assignment reminder,please submit your assignment before friday,no,no,70,not spam
+e009,rewardsgiftcardscom,free gift card,claim your free amazon gift card now,yes,yes,115,spam
+e010,bossofficecom,project update,please send the updated project report by evening,no,no,90,not spam

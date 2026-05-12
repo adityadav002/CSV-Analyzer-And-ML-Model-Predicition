@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width,
+                   initial-scale=1.0">
+
+    <title>ML Analysis</title>
+</head>
+
+<body>
+
+    <h1>ML Problem Type Detection</h1>
+
+    <form method="POST"
+          id="datasetForm">
+
+        <!-- DATASET -->
+        <label>Select Dataset:</label>
+
+        <select name="dataset"
+                onchange="resetTarget()">
+
+            {% for file in files %}
+
+                <option value="{{ file }}"
+                    {% if file == selected_file %}
+                        selected
+                    {% endif %}
+                >
+                    {{ file }}
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+        <br><br>
+
+        <!-- TARGET COLUMN -->
+        {% if columns %}
+
+        <label>Select Target Column:</label>
+
+        <select name="target_column">
+
+            <option value="">
+                No Target Column (Clustering)
+            </option>
+
+            {% for column in columns %}
+
+                <option value="{{ column }}"
+                    {% if column == target_column %}
+                        selected
+                    {% endif %}
+                >
+                    {{ column }}
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+        {% endif %}
+
+        <br><br>
+
+        <button type="submit">
+            Analyze Dataset
+        </button>
+
+    </form>
+
+    <hr>
+
+    <!-- DATASET PREVIEW -->
+    {% if table %}
+
+        <h2>Dataset Preview</h2>
+
+        {{ table | safe }}
+
+    {% endif %}
+
+    <hr>
+
+    <!-- ML RESULT -->
+    {% if result %}
+
+        <h2>Detected Problem Type</h2>
+
+        <h3>{{ result.problem_type }}</h3>
+
+        {% if result.sub_type %}
+
+            <h4>{{ result.sub_type }}</h4>
+
+        {% endif %}
+
+        <h3>Suggested Algorithms</h3>
+
+        <ul>
+
+            {% for algo in result.algorithms %}
+
+                <li>{{ algo }}</li>
+
+            {% endfor %}
+
+        </ul>
+
+    {% endif %}
+
+    <script>
+
+        function resetTarget() {
+
+            const targetDropdown =
+                document.querySelector(
+                    'select[name="target_column"]'
+                );
+
+            if (targetDropdown) {
+
+                targetDropdown.selectedIndex = 0;
+
+            }
+        }
+
+    </script>
+
+</body>
+</html>
