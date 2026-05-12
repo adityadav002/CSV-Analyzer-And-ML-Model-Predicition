@@ -1,30 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width,
-                   initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>ML Analysis</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background-color: #f5f5f5;
+        }
+
+        h1, h2, h3, h4 {
+            color: #333;
+        }
+
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        select,
+        button {
+            padding: 10px;
+            margin-top: 10px;
+            width: 300px;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result-box {
+            background: white;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ccc;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .model-card {
+            background: #fafafa;
+            border-left: 5px solid #007bff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .best-model {
+            border-left: 5px solid green;
+        }
+
+        ul {
+            margin-top: 10px;
+        }
+
+    </style>
+
 </head>
 
 <body>
 
     <h1>ML Problem Type Detection</h1>
 
-    <form method="POST"
-          id="datasetForm">
+    <!-- FORM -->
+    <form
+        method="POST"
+        action="/analysis"
+        id="datasetForm"
+    >
 
         <!-- DATASET -->
-        <label>Select Dataset:</label>
+        <label>
+            <strong>Select Dataset:</strong>
+        </label>
 
-        <select name="dataset"
-                onchange="resetTarget()">
+        <br>
+
+        <select
+            name="dataset"
+            onchange="resetTarget()"
+        >
 
             {% for file in files %}
 
-                <option value="{{ file }}"
+                <option
+                    value="{{ file }}"
                     {% if file == selected_file %}
                         selected
                     {% endif %}
@@ -41,27 +145,32 @@
         <!-- TARGET COLUMN -->
         {% if columns %}
 
-        <label>Select Target Column:</label>
+            <label>
+                <strong>Select Target Column:</strong>
+            </label>
 
-        <select name="target_column">
+            <br>
 
-            <option value="">
-                No Target Column (Clustering)
-            </option>
+            <select name="target_column">
 
-            {% for column in columns %}
-
-                <option value="{{ column }}"
-                    {% if column == target_column %}
-                        selected
-                    {% endif %}
-                >
-                    {{ column }}
+                <option value="">
+                    No Target Column (Clustering)
                 </option>
 
-            {% endfor %}
+                {% for column in columns %}
 
-        </select>
+                    <option
+                        value="{{ column }}"
+                        {% if column == target_column %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ column }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
 
         {% endif %}
 
@@ -73,43 +182,174 @@
 
     </form>
 
-    <hr>
-
     <!-- DATASET PREVIEW -->
     {% if table %}
 
-        <h2>Dataset Preview</h2>
+        <div class="result-box">
 
-        {{ table | safe }}
+            <h2>Dataset Preview</h2>
+
+            {{ table | safe }}
+
+        </div>
 
     {% endif %}
-
-    <hr>
 
     <!-- ML RESULT -->
     {% if result %}
 
-        <h2>Detected Problem Type</h2>
+        <div class="result-box">
 
-        <h3>{{ result.problem_type }}</h3>
+            <h2>Detected Problem Type</h2>
 
-        {% if result.sub_type %}
+            <h3>
+                {{ result.problem_type }}
+            </h3>
 
-            <h4>{{ result.sub_type }}</h4>
+            {% if result.sub_type %}
 
-        {% endif %}
+                <h4>
+                    {{ result.sub_type }}
+                </h4>
 
-        <h3>Suggested Algorithms</h3>
+            {% endif %}
 
-        <ul>
+            <h3>Suggested Algorithms</h3>
 
-            {% for algo in result.algorithms %}
+            <ul>
 
-                <li>{{ algo }}</li>
+                {% for algo in result.algorithms %}
+
+                    <li>
+                        {{ algo }}
+                    </li>
+
+                {% endfor %}
+
+            </ul>
+
+        </div>
+
+    {% endif %}
+
+    <!-- MODEL RESULTS -->
+    {% if predictions %}
+
+        <div class="result-box">
+
+            <h2>Model Comparison</h2>
+
+            {% for prediction in predictions %}
+
+                <div class="model-card">
+
+                    <h3>
+                        {{ prediction["Model"] }}
+                    </h3>
+
+                    <!-- REGRESSION -->
+                    {% if prediction["RMSE"] is defined %}
+
+                        <p>
+                            <strong>RMSE:</strong>
+                            {{ prediction["RMSE"] }}
+                        </p>
+
+                    {% endif %}
+
+                    {% if prediction["R2 Score"] is defined %}
+
+                        <p>
+                            <strong>R2 Score:</strong>
+                            {{ prediction["R2 Score"] }}
+                        </p>
+
+                    {% endif %}
+
+                    <!-- CLASSIFICATION -->
+                    {% if prediction["Accuracy"] is defined %}
+
+                        <p>
+                            <strong>Accuracy:</strong>
+                            {{ prediction["Accuracy"] }}%
+                        </p>
+
+                    {% endif %}
+
+                    {% if prediction["Precision"] is defined %}
+
+                        <p>
+                            <strong>Precision:</strong>
+                            {{ prediction["Precision"] }}
+                        </p>
+
+                    {% endif %}
+
+                    {% if prediction["Recall"] is defined %}
+
+                        <p>
+                            <strong>Recall:</strong>
+                            {{ prediction["Recall"] }}
+                        </p>
+
+                    {% endif %}
+
+                    {% if prediction["F1 Score"] is defined %}
+
+                        <p>
+                            <strong>F1 Score:</strong>
+                            {{ prediction["F1 Score"] }}
+                        </p>
+
+                    {% endif %}
+
+                </div>
 
             {% endfor %}
 
-        </ul>
+        </div>
+
+    {% endif %}
+
+    <!-- BEST MODEL -->
+    {% if best_model %}
+
+        <div class="result-box best-model">
+
+            <h2>Best Model</h2>
+
+            <h3>
+                {{ best_model["Model"] }}
+            </h3>
+
+            {% if best_model["RMSE"] is defined %}
+
+                <p>
+                    <strong>RMSE:</strong>
+                    {{ best_model["RMSE"] }}
+                </p>
+
+            {% endif %}
+
+            {% if best_model["R2 Score"] is defined %}
+
+                <p>
+                    <strong>R2 Score:</strong>
+                    {{ best_model["R2 Score"] }}
+                </p>
+
+            {% endif %}
+
+            {% if best_model["Accuracy"] is defined %}
+
+                <p>
+                    <strong>Accuracy:</strong>
+                    {{ best_model["Accuracy"] }}
+                </p>
+
+            {% endif %}
+
+        </div>
 
     {% endif %}
 
@@ -127,9 +367,11 @@
                 targetDropdown.selectedIndex = 0;
 
             }
+
         }
 
     </script>
 
 </body>
+
 </html>

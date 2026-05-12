@@ -120,56 +120,148 @@ def home():
         correlation_report=correlation_report,
     )
 
-@app.route("/analyze", methods=["POST"])
-def analyze():
-    dataset_name = request.form.get("dataset")
-    target_column = request.form.get("target_column")
-    path = os.path.join("datasets", dataset_name)
-    df = pd.read_csv(path)
+@app.route("/analysis", methods=["GET", "POST"])
+def analysis():
 
     # =========================
-    # DETECT PROBLEM TYPE
+    # DEFAULT VALUES
     # =========================
-    result = detect_problem_type(
-        df,
-        target_column
-    )
-
-    problem_type = result["problem_type"]
-
-    # =========================
-    # TRAIN MODELS
-    # =========================
+    result = None
     predictions = None
+    table = None
+    columns = []
 
-    if problem_type == "Regression":
+    selected_file = None
+    target_column = None
 
-        predictions = train_regression_models(
-            df,
-            target_column,
-            result
+    # =========================
+    # GET ALL FILES
+    # =========================
+    files = os.listdir("outputs")
+
+    # =========================
+    # FORM SUBMISSION
+    # =========================
+    if request.method == "POST":
+
+        # Selected dataset
+        selected_file = request.form.get("dataset")
+
+        # Selected target column
+        target_column = request.form.get(
+            "target_column",
+            None
         )
 
-    elif problem_type == "Classification":
+        # =========================
+        # VALIDATION
+        # =========================
+        if selected_file:
 
-        predictions = train_classification_models(
-            df,
-            target_column,
-            result
-        )
+            # File path
+            path = os.path.join(
+                "outputs",
+                selected_file
+            )
 
-    elif problem_type == "NLP Classification":
+            # Read dataset
+            df = pd.read_csv(path)
 
-        predictions = train_nlp_models(
-            df,
-            target_column,
-            result
-        )
+            # Clean column names
+            df.columns = (
+                df.columns
+                .str.strip()
+                .str.lower()
+            )
 
+            # Clean target column
+            if target_column:
+
+                target_column = (
+                    target_column
+                    .strip()
+                    .lower()
+                )
+
+            # =========================
+            # DATASET PREVIEW
+            # =========================
+            table = df.head().to_html(
+                classes="table table-bordered"
+            )
+
+            # Column list
+            columns = df.columns.tolist()
+
+            # =========================
+            # DETECT PROBLEM TYPE
+            # =========================
+            result = detect_problem_type(
+                df,
+                target_column
+            )
+
+            problem_type = result["problem_type"]
+
+            # =========================
+            # TRAIN MODELS
+            # =========================
+            if target_column:
+
+                if problem_type == "Regression":
+
+                    predictions = (
+                        train_regression_models(
+                            df,
+                            target_column,
+                            result
+                        )
+                    )
+
+                elif problem_type == "Classification":
+
+                    predictions = (
+                        train_classification_models(
+                            df,
+                            target_column,
+                            result
+                        )
+                    )
+
+                elif problem_type == "NLP Classification":
+
+                    predictions = (
+                        train_nlp_models(
+                            df,
+                            target_column,
+                            result
+                        )
+                    )
+
+    # =========================
+    # RETURN TEMPLATE
+    # =========================
     return render_template(
-        "result.html",
+        "analysis.html",
+
+        files=files,
+        table=table,
+        columns=columns,
+
+        selected_file=selected_file,
+        target_column=target_column,
+
         result=result,
-        predictions=predictions
+
+        predictions=(
+            predictions["all_results"]
+            if predictions else None
+        ),
+
+        best_model=(
+            predictions["best_model"]
+            if predictions else None
+        )
     )
 
 if __name__ == "__main__":
