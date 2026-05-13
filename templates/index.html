@@ -1,556 +1,607 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../static/styles/index.css" />
+    <title>Data Loader</title>
+  </head>
 
-<head>
-
-  <meta charset="UTF-8" />
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
-
-  <title>Data Loader</title>
-
-  <style>
-
-    *{
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body{
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f9;
-      padding: 40px;
-    }
-
-    h1, h2, h4{
-      margin-bottom: 15px;
-      color: #333;
-    }
-
-    hr{
-      margin: 30px 0;
-      border: 1px solid #ddd;
-    }
-
-    .container{
-      max-width: 1200px;
-      margin: auto;
-    }
-
-    .card{
-      background-color: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      margin-bottom: 30px;
-    }
-
-    /* ===================================== */
-    /* DRAG & DROP */
-    /* ===================================== */
-
-    .upload-box{
-      border: 3px dashed #999;
-      border-radius: 12px;
-      padding: 50px;
-      text-align: center;
-      background-color: #fafafa;
-      transition: 0.3s;
-      cursor: pointer;
-    }
-
-    .upload-box.dragover{
-      background-color: #e8f2ff;
-      border-color: #007bff;
-    }
-
-    .upload-box h2{
-      margin-bottom: 10px;
-    }
-
-    .upload-box p{
-      color: #666;
-    }
-
-    input[type="file"]{
-      display: none;
-    }
-
-    #file-name{
-      margin-top: 15px;
-      color: green;
-      font-weight: bold;
-    }
-
-    /* ===================================== */
-    /* BUTTONS */
-    /* ===================================== */
-
-    button{
-      margin-top: 20px;
-      padding: 12px 25px;
-      border: none;
-      border-radius: 8px;
-      background-color: #007bff;
-      color: white;
-      cursor: pointer;
-      font-size: 16px;
-      transition: 0.3s;
-    }
-
-    button:hover{
-      background-color: #0056b3;
-    }
-
-    /* ===================================== */
-    /* SELECT */
-    /* ===================================== */
-
-    select{
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-
-    /* ===================================== */
-    /* TABLE */
-    /* ===================================== */
-
-    table{
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    table th,
-    table td{
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: left;
-    }
-
-    table th{
-      background-color: #007bff;
-      color: white;
-    }
-
-    table tr:nth-child(even){
-      background-color: #f9f9f9;
-    }
-
-    /* ===================================== */
-    /* IMAGE */
-    /* ===================================== */
-
-    img{
-      margin-top: 20px;
-      border-radius: 10px;
-      max-width: 100%;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-
-    ul{
-      margin-left: 20px;
-    }
-
-    li{
-      margin-bottom: 8px;
-    }
-
-  </style>
-
-</head>
-
-<body>
-
-  <div class="container">
+  <body>
+    <!-- Background decoration -->
+    <div class="bg-grid"></div>
+    <div class="bg-orb bg-orb--1"></div>
+    <div class="bg-orb bg-orb--2"></div>
 
     <!-- ===================================== -->
-    <!-- UPLOAD CSV -->
+    <!-- NAVIGATION -->
     <!-- ===================================== -->
 
-    <div class="card">
-
-      <h1>Upload CSV Dataset</h1>
-
-      <form
-        method="POST"
-        enctype="multipart/form-data"
-      >
-
-        <div
-          class="upload-box"
-          id="drop-area"
-        >
-
-          <h2>Drag & Drop CSV File</h2>
-
-          <p>or click to choose file</p>
-
-          <input
-            type="file"
-            id="fileInput"
-            name="fileInput"
-            accept=".csv"
+    <nav class="navbar">
+      <div class="navbar__brand">
+        <span class="navbar__logo">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
           >
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+        </span>
+        <span class="navbar__name">DataScope</span>
+      </div>
+      <div class="navbar__links">
+        <a href="/" class="navbar__link navbar__link--active">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          Home
+        </a>
+        <a href="/visualize" class="navbar__link">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+            <polyline points="17 6 23 6 23 12" />
+          </svg>
+          Visualize
+        </a>
+        <a href="/analysis" class="navbar__link">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          Analysis
+        </a>
+      </div>
+    </nav>
 
-          <div id="file-name"></div>
+    <!-- ===================================== -->
+    <!-- MAIN CONTENT -->
+    <!-- ===================================== -->
 
+    <main class="main">
+      <!-- Page header -->
+      <header class="page-header">
+        <div class="page-header__eyebrow">Data Management</div>
+        <h1 class="page-header__title">Load Your Dataset</h1>
+        <p class="page-header__subtitle">
+          Upload a CSV file or select an existing dataset to begin analysis
+        </p>
+      </header>
+
+      <div class="dashboard">
+        <!-- ===================================== -->
+        <!-- UPLOAD + SELECT ROW -->
+        <!-- ===================================== -->
+
+        <div class="dashboard__row dashboard__row--top">
+          <!-- Upload CSV -->
+          <section class="card card--upload">
+            <div class="card__header">
+              <div class="card__icon card__icon--blue">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+              </div>
+              <h2 class="card__title">Upload CSV Dataset</h2>
+            </div>
+
+            <form
+              method="POST"
+              enctype="multipart/form-data"
+              class="upload-form"
+            >
+              <div class="drop-zone" id="drop-area">
+                <div class="drop-zone__icon">
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  >
+                    <path
+                      d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                    />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="12" y1="18" x2="12" y2="12" />
+                    <polyline points="9 15 12 12 15 15" />
+                  </svg>
+                </div>
+                <p class="drop-zone__title">Drag &amp; Drop CSV File</p>
+                <p class="drop-zone__subtitle">
+                  or <span class="drop-zone__browse">browse files</span>
+                </p>
+                <p class="drop-zone__hint">Supports .csv files</p>
+                <input
+                  type="file"
+                  id="fileInput"
+                  name="fileInput"
+                  accept=".csv"
+                  class="drop-zone__input"
+                />
+                <div id="file-name" class="drop-zone__filename"></div>
+              </div>
+
+              <button
+                type="submit"
+                name="upload_csv"
+                class="btn btn--primary btn--full"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                Add CSV
+              </button>
+            </form>
+          </section>
+
+          <!-- Select Dataset -->
+          <section class="card card--select">
+            <div class="card__header">
+              <div class="card__icon card__icon--teal">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <ellipse cx="12" cy="5" rx="9" ry="3" />
+                  <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                  <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                </svg>
+              </div>
+              <h2 class="card__title">Select Existing Dataset</h2>
+            </div>
+
+            <form method="POST" class="select-form">
+              <div class="select-wrapper">
+                <select name="dataset" class="select-input">
+                  <option value="">Choose a dataset…</option>
+                  {% for file in files %}
+                  <option value="{{ file }}">{{ file }}</option>
+                  {% endfor %}
+                </select>
+                <div class="select-arrow">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </div>
+              </div>
+
+              <div class="select-form__hint">
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                Previously uploaded datasets appear here
+              </div>
+
+              <button
+                type="submit"
+                name="load_dataset"
+                class="btn btn--secondary btn--full"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 002-2v-4M17 9l-5 5-5-5M12 12.8V2.5"
+                  />
+                </svg>
+                Load Dataset
+              </button>
+            </form>
+          </section>
         </div>
 
-        <button
-          type="submit"
-          name="upload_csv"
-        >
-          Add CSV
-        </button>
+        <!-- ===================================== -->
+        <!-- DATASET INFO BAR -->
+        <!-- ===================================== -->
 
-      </form>
+        <div class="info-bar">
+          <div class="info-bar__item">
+            <span class="info-bar__label">Rows</span>
+            <span class="info-bar__value"
+              >{% if rows is not none %}{{ rows }}{% else %}—{% endif %}</span
+            >
+          </div>
+          <div class="info-bar__divider"></div>
+          <div class="info-bar__item">
+            <span class="info-bar__label">Columns</span>
+            <span class="info-bar__value"
+              >{% if cols is not none %}{{ cols }}{% else %}—{% endif %}</span
+            >
+          </div>
+          <div class="info-bar__divider"></div>
+          <div class="info-bar__item info-bar__item--status">
+            <span
+              class="info-bar__dot {% if rows is not none %}info-bar__dot--active{% endif %}"
+            ></span>
+            <span class="info-bar__label"
+              >{% if rows is not none %}Dataset Loaded{% else %}No Dataset{%
+              endif %}</span
+            >
+          </div>
+        </div>
 
-    </div>
+        <!-- ===================================== -->
+        <!-- DATASET PREVIEW -->
+        <!-- ===================================== -->
+
+        {% if table %}
+        <section class="card card--table animate-in">
+          <div class="card__header">
+            <div class="card__icon card__icon--purple">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <line x1="3" y1="9" x2="21" y2="9" />
+                <line x1="3" y1="15" x2="21" y2="15" />
+                <line x1="9" y1="3" x2="9" y2="21" />
+                <line x1="15" y1="3" x2="15" y2="21" />
+              </svg>
+            </div>
+            <h2 class="card__title">Dataset Preview</h2>
+            <span class="card__badge">Preview</span>
+          </div>
+          <div class="table-scroll">{{ table | safe }}</div>
+        </section>
+        {% endif %}
+
+        <!-- ===================================== -->
+        <!-- DESCRIPTION -->
+        <!-- ===================================== -->
+
+        {% if description %}
+        <section class="card animate-in">
+          <div class="card__header">
+            <div class="card__icon card__icon--orange">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"
+                />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg>
+            </div>
+            <h2 class="card__title">Dataset Description</h2>
+          </div>
+          <div class="description-body">{{ description | safe }}</div>
+        </section>
+        {% endif %}
+
+        <!-- ===================================== -->
+        <!-- DATA TYPES -->
+        <!-- ===================================== -->
+
+        {% if dtypes %}
+        <section class="card animate-in">
+          <div class="card__header">
+            <div class="card__icon card__icon--blue">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="16 18 22 12 16 6" />
+                <polyline points="8 6 2 12 8 18" />
+              </svg>
+            </div>
+            <h2 class="card__title">Column Data Types</h2>
+          </div>
+          <div class="table-scroll">{{ dtypes | safe }}</div>
+        </section>
+        {% endif %}
+
+        <!-- ===================================== -->
+        <!-- NUMERICAL + CATEGORICAL ROW -->
+        <!-- ===================================== -->
+
+        <div class="dashboard__row dashboard__row--stats">
+          {% if numerical_table %}
+          <section class="card animate-in">
+            <div class="card__header">
+              <div class="card__icon card__icon--teal">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <line x1="18" y1="20" x2="18" y2="10" />
+                  <line x1="12" y1="20" x2="12" y2="4" />
+                  <line x1="6" y1="20" x2="6" y2="14" />
+                </svg>
+              </div>
+              <h2 class="card__title">Numerical Columns</h2>
+              <span class="card__badge card__badge--teal">Numeric</span>
+            </div>
+            <div class="table-scroll">{{ numerical_table | safe }}</div>
+            <div class="card__divider"></div>
+            <h4 class="card__subtitle">Statistics</h4>
+            <div class="table-scroll">{{ numerical_desc | safe }}</div>
+          </section>
+          {% endif %} {% if categorical_table %}
+          <section class="card animate-in">
+            <div class="card__header">
+              <div class="card__icon card__icon--purple">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="2" y="7" width="4" height="10" rx="1" />
+                  <rect x="10" y="4" width="4" height="13" rx="1" />
+                  <rect x="18" y="10" width="4" height="7" rx="1" />
+                </svg>
+              </div>
+              <h2 class="card__title">Categorical Columns</h2>
+              <span class="card__badge card__badge--purple">Categorical</span>
+            </div>
+            <div class="table-scroll">{{ categorical_table | safe }}</div>
+            <div class="card__divider"></div>
+            <h4 class="card__subtitle">Details</h4>
+            <div class="table-scroll">{{ categorical_desc | safe }}</div>
+          </section>
+          {% endif %}
+        </div>
+
+        <!-- ===================================== -->
+        <!-- OUTLIERS + CORRELATIONS ROW -->
+        <!-- ===================================== -->
+
+        <div class="dashboard__row dashboard__row--reports">
+          <!-- Outlier Report -->
+          <section class="card animate-in">
+            <div class="card__header">
+              <div class="card__icon card__icon--orange">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                  />
+                  <line x1="12" y1="9" x2="12" y2="13" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+              </div>
+              <h2 class="card__title">Outlier Report</h2>
+            </div>
+
+            {% if outlier_report %}
+            <ul class="report-list">
+              {% for report in outlier_report %}
+              <li class="report-list__item report-list__item--warning">
+                <span class="report-list__dot"></span>
+                {{ report }}
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <div class="report-empty">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+              <p>No significant outliers found</p>
+            </div>
+            {% endif %}
+          </section>
+
+          <!-- Correlation Report -->
+          <section class="card animate-in">
+            <div class="card__header">
+              <div class="card__icon card__icon--blue">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M3 3l18 18" />
+                  <path d="M9 3h12v12" />
+                  <path d="M3 9v12h12" />
+                </svg>
+              </div>
+              <h2 class="card__title">Correlation Report</h2>
+            </div>
+
+            {% if correlation_report %}
+            <ul class="report-list">
+              {% for report in correlation_report %}
+              <li class="report-list__item report-list__item--info">
+                <span class="report-list__dot"></span>
+                {{ report }}
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <div class="report-empty">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+              <p>No significant correlations found</p>
+            </div>
+            {% endif %}
+          </section>
+        </div>
+      </div>
+    </main>
 
     <!-- ===================================== -->
-    <!-- SELECT DATASET -->
+    <!-- JAVASCRIPT -->
     <!-- ===================================== -->
 
-    <div class="card">
-
-      <h1>Select Existing Dataset</h1>
-
-      <form method="POST">
-
-        <select name="dataset">
-
-          <option value="">
-            Select Dataset
-          </option>
-
-          {% for file in files %}
-
-            <option value="{{ file }}">
-              {{ file }}
-            </option>
-
-          {% endfor %}
-
-        </select>
-
-        <button
-          type="submit"
-          name="load_dataset"
-        >
-          Load Dataset
-        </button>
-
-      </form>
-
-    </div>
-
-    <!-- ===================================== -->
-    <!-- DATASET PREVIEW -->
-    <!-- ===================================== -->
-
-    {% if table %}
-
-    <div class="card">
-
-      <h1>Dataset Preview</h1>
-
-      {{ table | safe }}
-
-    </div>
-
-    {% endif %}
-
-    <!-- ===================================== -->
-    <!-- DESCRIPTION -->
-    <!-- ===================================== -->
-
-    {% if description %}
-
-    <div class="card">
-
-      <h1>Dataset Description</h1>
-
-      {{ description | safe }}
-
-    </div>
-
-    {% endif %}
-
-    <!-- ===================================== -->
-    <!-- DATASET INFO -->
-    <!-- ===================================== -->
-
-    <div class="card">
-
-      <h1>Dataset Info</h1>
-
-      {% if rows is not none and cols is not none %}
-
-      <p>
-        <strong>Rows:</strong>
-        {{ rows }}
-      </p>
-
-      <br>
-
-      <p>
-        <strong>Columns:</strong>
-        {{ cols }}
-      </p>
-
-      {% endif %}
-
-    </div>
-
-    <!-- ===================================== -->
-    <!-- DATA TYPES -->
-    <!-- ===================================== -->
-
-    {% if dtypes %}
-
-    <div class="card">
-
-      <h1>Column Data Types</h1>
-
-      {{ dtypes | safe }}
-
-    </div>
-
-    {% endif %}
-
-    <!-- ===================================== -->
-    <!-- NUMERICAL -->
-    <!-- ===================================== -->
-
-    {% if numerical_table %}
-
-    <div class="card">
-
-      <h2>Numerical Columns</h2>
-
-      {{ numerical_table | safe }}
-
-      <br>
-
-      <h4>Statistics</h4>
-
-      {{ numerical_desc | safe }}
-
-    </div>
-
-    {% endif %}
-
-    <!-- ===================================== -->
-    <!-- CATEGORICAL -->
-    <!-- ===================================== -->
-
-    {% if categorical_table %}
-
-    <div class="card">
-
-      <h2>Categorical Columns</h2>
-
-      {{ categorical_table | safe }}
-
-      <br>
-
-      <h4>Details</h4>
-
-      {{ categorical_desc | safe }}
-
-    </div>
-
-    {% endif %}
-
-    <!-- ===================================== -->
-    <!-- OUTLIERS -->
-    <!-- ===================================== -->
-
-    <div class="card">
-
-      <h2>Outlier Report</h2>
-
-      {% if outlier_report %}
-
-      <ul>
-
-        {% for report in outlier_report %}
-
-          <li>{{ report }}</li>
-
-        {% endfor %}
-
-      </ul>
-
-      {% else %}
-
-      <p>No significant outliers found.</p>
-
-      {% endif %}
-
-    </div>
-
-    <!-- ===================================== -->
-    <!-- CORRELATION -->
-    <!-- ===================================== -->
-
-    <div class="card">
-
-      <h2>Correlation Report</h2>
-
-      {% if correlation_report %}
-
-      <ul>
-
-        {% for report in correlation_report %}
-
-          <li>{{ report }}</li>
-
-        {% endfor %}
-
-      </ul>
-
-      {% else %}
-
-      <p>No significant correlations found.</p>
-
-      {% endif %}
-
-    </div>
-
-    <!-- ===================================== -->
-    <!-- VISUALIZATIONS -->
-    <!-- ===================================== -->
-
-    <div class="card">
-
-      <h2>Visualizations</h2>
-
-      {% for plot in plot_paths %}
-
-      <img
-        src="{{ url_for('static', filename=plot) }}"
-        width="700"
-      />
-
-      {% endfor %}
-
-    </div>
-
-  </div>
-
-  <!-- ===================================== -->
-  <!-- JAVASCRIPT -->
-  <!-- ===================================== -->
-
-  <script>
-
-    const dropArea =
-      document.getElementById("drop-area");
-
-    const fileInput =
-      document.getElementById("fileInput");
-
-    const fileName =
-      document.getElementById("file-name");
-
-
-    // Open file chooser
-    dropArea.addEventListener("click", () => {
-
-      fileInput.click();
-
-    });
-
-
-    // Show selected filename
-    fileInput.addEventListener("change", () => {
-
-      if(fileInput.files.length > 0){
-
-        fileName.innerHTML =
-          "Selected File: " +
-          fileInput.files[0].name;
-
-      }
-
-    });
-
-
-    // Prevent browser default behavior
-    ["dragenter", "dragover", "dragleave", "drop"]
-    .forEach(eventName => {
-
-      dropArea.addEventListener(
-        eventName,
-        preventDefaults,
-        false
+    <script>
+      const dropArea = document.getElementById("drop-area");
+      const fileInput = document.getElementById("fileInput");
+      const fileName = document.getElementById("file-name");
+
+      dropArea.addEventListener("click", () => fileInput.click());
+
+      fileInput.addEventListener("change", () => {
+        if (fileInput.files.length > 0) {
+          fileName.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ${fileInput.files[0].name}`;
+          dropArea.classList.add("drop-zone--has-file");
+        }
+      });
+
+      ["dragenter", "dragover", "dragleave", "drop"].forEach((evt) =>
+        dropArea.addEventListener(evt, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }),
       );
 
-    });
+      ["dragenter", "dragover"].forEach((evt) =>
+        dropArea.addEventListener(evt, () =>
+          dropArea.classList.add("drop-zone--dragover"),
+        ),
+      );
 
+      ["dragleave", "drop"].forEach((evt) =>
+        dropArea.addEventListener(evt, () =>
+          dropArea.classList.remove("drop-zone--dragover"),
+        ),
+      );
 
-    function preventDefaults(e){
-
-      e.preventDefault();
-
-      e.stopPropagation();
-
-    }
-
-
-    // Highlight drop area
-    ["dragenter", "dragover"]
-    .forEach(eventName => {
-
-      dropArea.addEventListener(eventName, () => {
-
-        dropArea.classList.add("dragover");
-
+      dropArea.addEventListener("drop", (e) => {
+        const files = e.dataTransfer.files;
+        fileInput.files = files;
+        if (files.length > 0) {
+          fileName.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ${files[0].name}`;
+          dropArea.classList.add("drop-zone--has-file");
+        }
       });
 
-    });
-
-
-    // Remove highlight
-    ["dragleave", "drop"]
-    .forEach(eventName => {
-
-      dropArea.addEventListener(eventName, () => {
-
-        dropArea.classList.remove("dragover");
-
-      });
-
-    });
-
-
-    // Handle dropped file
-    dropArea.addEventListener("drop", (e) => {
-
-      const files = e.dataTransfer.files;
-
-      fileInput.files = files;
-
-      if(files.length > 0){
-
-        fileName.innerHTML =
-          "Selected File: " +
-          files[0].name;
-
-      }
-
-    });
-
-  </script>
-
-</body>
+      // Animate cards on scroll
+      const observer = new IntersectionObserver(
+        (entries) =>
+          entries.forEach((e) => {
+            if (e.isIntersecting) e.target.classList.add("animate-in--visible");
+          }),
+        { threshold: 0.1 },
+      );
+      document
+        .querySelectorAll(".animate-in")
+        .forEach((el) => observer.observe(el));
+    </script>
+  </body>
 </html>

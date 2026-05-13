@@ -25,7 +25,6 @@ def home():
     numerical_desc = None   
     categorical_table = None
     categorical_desc = None
-    plot_paths = []
     outlier_report = []
     correlation_report = []
 
@@ -119,9 +118,6 @@ def home():
                             f"(Correlation: {corr_value:.2f})"
                         )
 
-            # Generate visualizations
-            plot_paths = generate_plots(df)
-
     return render_template(
         "index.html",
         files=files,
@@ -134,11 +130,37 @@ def home():
         numerical_desc=numerical_desc,
         categorical_table=categorical_table,
         categorical_desc=categorical_desc,
-        plot_paths=plot_paths,
         outlier_report=outlier_report,
         correlation_report=correlation_report,
     )
 
+@app.route("/visualize", methods=["GET", "POST"])
+def visualize():
+    files = [
+        file for file in os.listdir("outputs")
+        if file.endswith(".csv")
+    ]
+    plot_paths = []
+
+    if request.method == "POST":
+        selected_file = request.form.get("dataset")
+        if selected_file:
+            # Full CSV path
+            path = os.path.join(
+                "outputs",
+                selected_file
+            )
+            # Read CSV
+            df = pd.read_csv(path)
+
+            # Generate plots
+            plot_paths = generate_plots(df)
+
+    return render_template(
+        "visualize.html",
+        files=files,
+        plot_paths=plot_paths
+    )
 
 @app.route("/analysis", methods=["GET", "POST"])
 def analysis():
@@ -180,7 +202,6 @@ def analysis():
 
             # Clean target column
             if target_column:
-
                 target_column = (
                     target_column
                     .strip()

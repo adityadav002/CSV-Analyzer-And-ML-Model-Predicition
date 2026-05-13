@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizer</title>
+    <link rel="stylesheet" href="../static/styles/visualize.css">
+</head>
+<body>
+
+  <nav>
+      <a href="/">Home</a>
+      <a href="/visualize">Visualize</a>
+      <a href="/analysis">Analysis</a>
+  </nav>
+    <form action="" method="POST">
+
+        <select name="dataset">
+          <option value="">
+            Select Dataset
+          </option>
+          {% for file in files %}
+            <option value="{{ file }}">
+              {{ file }}
+            </option>
+          {% endfor %}
+        </select>
+
+        <button
+          type="submit"
+          name="load_dataset"
+        >
+          Load Dataset
+        </button>
+
+    </form>
+
+    <div class="card">
+
+      <h2>Visualizations</h2>
+      {% for plot in plot_paths %}
+      <img
+        src="{{ url_for('static', filename=plot) }}"
+        width="500"
+      />
+      {% endfor %}
+
+    </div>
+
+</body>
+</html>
