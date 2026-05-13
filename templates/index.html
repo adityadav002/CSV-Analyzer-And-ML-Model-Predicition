@@ -1,90 +1,556 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Data Loader</title>
-  </head>
-  <body>
-    <h1>Select Dataset</h1>
-    <hr />
-    <form method="POST">
-      <select name="dataset">
-        {% for file in files %}
-        <option value="{{ file }}">{{ file }}</option>
-        {% endfor %}
-      </select>
-      <button type="submit">Load Dataset</button>
-    </form>
-    <br />
-    {% if table %} {{ table | safe }} {% endif %}
-    <br />
-    <hr />
-    <h1>Dataset Description</h1>
-    {% if description %} {{ description | safe }} {% endif %}
 
-    <hr />
-    <h1>Dataset Info</h1>
-    {% if rows is not none and cols is not none %}
-    <p><strong>Rows:</strong> {{ rows }}</p>
-    <p><strong>Columns:</strong> {{ cols }}</p>
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>Data Loader</title>
+
+  <style>
+
+    *{
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body{
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f9;
+      padding: 40px;
+    }
+
+    h1, h2, h4{
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    hr{
+      margin: 30px 0;
+      border: 1px solid #ddd;
+    }
+
+    .container{
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .card{
+      background-color: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+
+    /* ===================================== */
+    /* DRAG & DROP */
+    /* ===================================== */
+
+    .upload-box{
+      border: 3px dashed #999;
+      border-radius: 12px;
+      padding: 50px;
+      text-align: center;
+      background-color: #fafafa;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .upload-box.dragover{
+      background-color: #e8f2ff;
+      border-color: #007bff;
+    }
+
+    .upload-box h2{
+      margin-bottom: 10px;
+    }
+
+    .upload-box p{
+      color: #666;
+    }
+
+    input[type="file"]{
+      display: none;
+    }
+
+    #file-name{
+      margin-top: 15px;
+      color: green;
+      font-weight: bold;
+    }
+
+    /* ===================================== */
+    /* BUTTONS */
+    /* ===================================== */
+
+    button{
+      margin-top: 20px;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    button:hover{
+      background-color: #0056b3;
+    }
+
+    /* ===================================== */
+    /* SELECT */
+    /* ===================================== */
+
+    select{
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    /* ===================================== */
+    /* TABLE */
+    /* ===================================== */
+
+    table{
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table th,
+    table td{
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    table th{
+      background-color: #007bff;
+      color: white;
+    }
+
+    table tr:nth-child(even){
+      background-color: #f9f9f9;
+    }
+
+    /* ===================================== */
+    /* IMAGE */
+    /* ===================================== */
+
+    img{
+      margin-top: 20px;
+      border-radius: 10px;
+      max-width: 100%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    ul{
+      margin-left: 20px;
+    }
+
+    li{
+      margin-bottom: 8px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- ===================================== -->
+    <!-- UPLOAD CSV -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+      <h1>Upload CSV Dataset</h1>
+
+      <form
+        method="POST"
+        enctype="multipart/form-data"
+      >
+
+        <div
+          class="upload-box"
+          id="drop-area"
+        >
+
+          <h2>Drag & Drop CSV File</h2>
+
+          <p>or click to choose file</p>
+
+          <input
+            type="file"
+            id="fileInput"
+            name="fileInput"
+            accept=".csv"
+          >
+
+          <div id="file-name"></div>
+
+        </div>
+
+        <button
+          type="submit"
+          name="upload_csv"
+        >
+          Add CSV
+        </button>
+
+      </form>
+
+    </div>
+
+    <!-- ===================================== -->
+    <!-- SELECT DATASET -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+      <h1>Select Existing Dataset</h1>
+
+      <form method="POST">
+
+        <select name="dataset">
+
+          <option value="">
+            Select Dataset
+          </option>
+
+          {% for file in files %}
+
+            <option value="{{ file }}">
+              {{ file }}
+            </option>
+
+          {% endfor %}
+
+        </select>
+
+        <button
+          type="submit"
+          name="load_dataset"
+        >
+          Load Dataset
+        </button>
+
+      </form>
+
+    </div>
+
+    <!-- ===================================== -->
+    <!-- DATASET PREVIEW -->
+    <!-- ===================================== -->
+
+    {% if table %}
+
+    <div class="card">
+
+      <h1>Dataset Preview</h1>
+
+      {{ table | safe }}
+
+    </div>
+
     {% endif %}
-    <hr />
-    <h1>Column Data Types</h1>
-    {% if dtypes %} {{ dtypes | safe }} {% endif %}
 
-    <br />
-    <hr />
-    <h2>Numerical Columns</h2>
-    {% if numerical_table %} {{ numerical_table | safe }}
-    <br />
-    <h4>Statistics</h4>
-    {{ numerical_desc | safe }} {% endif %}
+    <!-- ===================================== -->
+    <!-- DESCRIPTION -->
+    <!-- ===================================== -->
 
-    <br />
-    <hr />
-    <h2>Categorical Columns</h2>
+    {% if description %}
 
-    {% if categorical_table %} {{ categorical_table | safe }}
-    <br />
-    <h4>Details</h4>
-    {{ categorical_desc | safe }} {% endif %}
+    <div class="card">
 
-    <br />
-    <hr />
-    <h2>Outlier Report</h2>
-    {% if outlier_report %}
+      <h1>Dataset Description</h1>
+
+      {{ description | safe }}
+
+    </div>
+
+    {% endif %}
+
+    <!-- ===================================== -->
+    <!-- DATASET INFO -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+      <h1>Dataset Info</h1>
+
+      {% if rows is not none and cols is not none %}
+
+      <p>
+        <strong>Rows:</strong>
+        {{ rows }}
+      </p>
+
+      <br>
+
+      <p>
+        <strong>Columns:</strong>
+        {{ cols }}
+      </p>
+
+      {% endif %}
+
+    </div>
+
+    <!-- ===================================== -->
+    <!-- DATA TYPES -->
+    <!-- ===================================== -->
+
+    {% if dtypes %}
+
+    <div class="card">
+
+      <h1>Column Data Types</h1>
+
+      {{ dtypes | safe }}
+
+    </div>
+
+    {% endif %}
+
+    <!-- ===================================== -->
+    <!-- NUMERICAL -->
+    <!-- ===================================== -->
+
+    {% if numerical_table %}
+
+    <div class="card">
+
+      <h2>Numerical Columns</h2>
+
+      {{ numerical_table | safe }}
+
+      <br>
+
+      <h4>Statistics</h4>
+
+      {{ numerical_desc | safe }}
+
+    </div>
+
+    {% endif %}
+
+    <!-- ===================================== -->
+    <!-- CATEGORICAL -->
+    <!-- ===================================== -->
+
+    {% if categorical_table %}
+
+    <div class="card">
+
+      <h2>Categorical Columns</h2>
+
+      {{ categorical_table | safe }}
+
+      <br>
+
+      <h4>Details</h4>
+
+      {{ categorical_desc | safe }}
+
+    </div>
+
+    {% endif %}
+
+    <!-- ===================================== -->
+    <!-- OUTLIERS -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+      <h2>Outlier Report</h2>
+
+      {% if outlier_report %}
+
       <ul>
+
         {% for report in outlier_report %}
+
           <li>{{ report }}</li>
+
         {% endfor %}
+
       </ul>
-    {% else %}
+
+      {% else %}
+
       <p>No significant outliers found.</p>
-    {% endif %}
 
-    <br />
-    <hr>
-    <h2>Correlation Report</h2>
-    {% if correlation_report %}
+      {% endif %}
+
+    </div>
+
+    <!-- ===================================== -->
+    <!-- CORRELATION -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+      <h2>Correlation Report</h2>
+
+      {% if correlation_report %}
+
       <ul>
-        {% for report in correlation_report %}
-          <li>{{ report }}</li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p>No significant correlations found.</p>
-    {% endif %}
 
-    <br>
-    <hr>
-    <h2>Visualizations</h2>
-    {% for plot in plot_paths %}
-    <img
-      src="{{ url_for('static', filename=plot) }}"
-      width="700"
-      class="mb-4"
-    />
-    {% endfor %}
-  </body>
+        {% for report in correlation_report %}
+
+          <li>{{ report }}</li>
+
+        {% endfor %}
+
+      </ul>
+
+      {% else %}
+
+      <p>No significant correlations found.</p>
+
+      {% endif %}
+
+    </div>
+
+    <!-- ===================================== -->
+    <!-- VISUALIZATIONS -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+      <h2>Visualizations</h2>
+
+      {% for plot in plot_paths %}
+
+      <img
+        src="{{ url_for('static', filename=plot) }}"
+        width="700"
+      />
+
+      {% endfor %}
+
+    </div>
+
+  </div>
+
+  <!-- ===================================== -->
+  <!-- JAVASCRIPT -->
+  <!-- ===================================== -->
+
+  <script>
+
+    const dropArea =
+      document.getElementById("drop-area");
+
+    const fileInput =
+      document.getElementById("fileInput");
+
+    const fileName =
+      document.getElementById("file-name");
+
+
+    // Open file chooser
+    dropArea.addEventListener("click", () => {
+
+      fileInput.click();
+
+    });
+
+
+    // Show selected filename
+    fileInput.addEventListener("change", () => {
+
+      if(fileInput.files.length > 0){
+
+        fileName.innerHTML =
+          "Selected File: " +
+          fileInput.files[0].name;
+
+      }
+
+    });
+
+
+    // Prevent browser default behavior
+    ["dragenter", "dragover", "dragleave", "drop"]
+    .forEach(eventName => {
+
+      dropArea.addEventListener(
+        eventName,
+        preventDefaults,
+        false
+      );
+
+    });
+
+
+    function preventDefaults(e){
+
+      e.preventDefault();
+
+      e.stopPropagation();
+
+    }
+
+
+    // Highlight drop area
+    ["dragenter", "dragover"]
+    .forEach(eventName => {
+
+      dropArea.addEventListener(eventName, () => {
+
+        dropArea.classList.add("dragover");
+
+      });
+
+    });
+
+
+    // Remove highlight
+    ["dragleave", "drop"]
+    .forEach(eventName => {
+
+      dropArea.addEventListener(eventName, () => {
+
+        dropArea.classList.remove("dragover");
+
+      });
+
+    });
+
+
+    // Handle dropped file
+    dropArea.addEventListener("drop", (e) => {
+
+      const files = e.dataTransfer.files;
+
+      fileInput.files = files;
+
+      if(files.length > 0){
+
+        fileName.innerHTML =
+          "Selected File: " +
+          files[0].name;
+
+      }
+
+    });
+
+  </script>
+
+</body>
 </html>

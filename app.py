@@ -1,5 +1,6 @@
 import os
 from flask import Flask, render_template, request
+from werkzeug.utils import secure_filename
 import pandas as pd
 
 from utils.loader import load_dataset
@@ -30,78 +31,96 @@ def home():
 
     # When user selects dataset
     if request.method == "POST":
-        selected_file = request.form["dataset"]
-        df = load_dataset(selected_file)
-        table = df.head().to_html(classes="table table-bordered")
+        df = None
 
-        try:
-            description = df.describe(include="all").to_html(classes="table")
-        except Exception as e:
-            description = f"<p>Error generating description: {e}</p>"
+        if "upload_csv" in request.form:
+            input_file = request.files.get("fileInput")
 
-        rows, cols = df.shape
-        dtypes = df.dtypes.to_frame(name="Data Type").to_html(classes="table table-bordered")
+            if input_file and input_file.filename.endswith(".csv"):
+                filename = secure_filename(input_file.filename)
+                save_path = os.path.join("datasets", filename)
+                input_file.save(save_path)
+                print("FILE SAVED:", filename)
+                files = os.listdir("datasets")
+                df = pd.read_csv(save_path)
+        
+        elif "load_dataset" in request.form:
+            selected_file = request.form.get("dataset")
+            if selected_file:
+                print("SELECTED:", selected_file)
+                df = load_dataset(selected_file)
 
-        # Categorical columns
-        categorical_df = df.select_dtypes(
-            include=["object"]
-        )
-        if not categorical_df.empty:
-            categorical_table = categorical_df.head().to_html(
-                classes="table table-bordered"
+        if df is not None:
+            table = df.head().to_html(classes="table table-bordered")
+
+            try:
+                description = df.describe(include="all").to_html(classes="table")
+            except Exception as e:
+                description = f"<p>Error generating description: {e}</p>"
+
+            rows, cols = df.shape
+            dtypes = df.dtypes.to_frame(name="Data Type").to_html(classes="table table-bordered")
+
+            # Categorical columns
+            categorical_df = df.select_dtypes(
+                include=["object"]
             )
-
-            categorical_desc = categorical_df.describe().to_html(
-                classes="table table-bordered"
-            )
-            
-        # Numeric columns
-        numerical_df = df.select_dtypes(
-            include=["number"]
-        )
-        if not numerical_df.empty: 
-            numerical_table = numerical_df.head().to_html( classes="table table-bordered" ) 
-            numerical_desc = numerical_df.describe().to_html( classes="table table-bordered" )
-
-        for column in numerical_df.columns:
-            Q1 = numerical_df[column].quantile(0.25)
-            Q3 = numerical_df[column].quantile(0.75)
-            IQR = Q3 - Q1
-            lower = Q1 - 1.5 * IQR
-            upper = Q3 + 1.5 * IQR
-            outliers = numerical_df[column][
-                (numerical_df[column] < lower) |
-                (numerical_df[column] > upper)
-            ]
-            outlier_count = len(outliers)
-            if outlier_count > 0:
-                percent = (outlier_count / len(df)) * 100
-                outlier_report.append(
-                    f"Column '{column}' contains "
-                    f"{outlier_count} outliers "
-                    f"({percent:.1f}% of data)."
+            if not categorical_df.empty:
+                categorical_table = categorical_df.head().to_html(
+                    classes="table table-bordered"
                 )
 
-        corr_matrix = numerical_df.corr()
-        columns = corr_matrix.columns
-        for i in range(len(columns)):
-            for j in range(i + 1, len(columns)):
-                col1 = columns[i]
-                col2 = columns[j]
-                corr_value = corr_matrix.loc[col1, col2]
-                if corr_value > 0.7:
-                    correlation_report.append(
-                        f"{col1} strongly affects {col2} "
-                        f"(Correlation: {corr_value:.2f})"
-                    )
-                elif corr_value < -0.7:
-                    correlation_report.append(
-                        f"{col1} strongly negatively affects {col2} "
-                        f"(Correlation: {corr_value:.2f})"
+                categorical_desc = categorical_df.describe().to_html(
+                    classes="table table-bordered"
+                )
+                
+            # Numeric columns
+            numerical_df = df.select_dtypes(
+                include=["number"]
+            )
+            if not numerical_df.empty: 
+                numerical_table = numerical_df.head().to_html( classes="table table-bordered" ) 
+                numerical_desc = numerical_df.describe().to_html( classes="table table-bordered" )
+
+            for column in numerical_df.columns:
+                Q1 = numerical_df[column].quantile(0.25)
+                Q3 = numerical_df[column].quantile(0.75)
+                IQR = Q3 - Q1
+                lower = Q1 - 1.5 * IQR
+                upper = Q3 + 1.5 * IQR
+                outliers = numerical_df[column][
+                    (numerical_df[column] < lower) |
+                    (numerical_df[column] > upper)
+                ]
+                outlier_count = len(outliers)
+                if outlier_count > 0:
+                    percent = (outlier_count / len(df)) * 100
+                    outlier_report.append(
+                        f"Column '{column}' contains "
+                        f"{outlier_count} outliers "
+                        f"({percent:.1f}% of data)."
                     )
 
-        # Generate visualizations
-        plot_paths = generate_plots(df)
+            corr_matrix = numerical_df.corr()
+            columns = corr_matrix.columns
+            for i in range(len(columns)):
+                for j in range(i + 1, len(columns)):
+                    col1 = columns[i]
+                    col2 = columns[j]
+                    corr_value = corr_matrix.loc[col1, col2]
+                    if corr_value > 0.7:
+                        correlation_report.append(
+                            f"{col1} strongly affects {col2} "
+                            f"(Correlation: {corr_value:.2f})"
+                        )
+                    elif corr_value < -0.7:
+                        correlation_report.append(
+                            f"{col1} strongly negatively affects {col2} "
+                            f"(Correlation: {corr_value:.2f})"
+                        )
+
+            # Generate visualizations
+            plot_paths = generate_plots(df)
 
     return render_template(
         "index.html",
@@ -120,12 +139,9 @@ def home():
         correlation_report=correlation_report,
     )
 
+
 @app.route("/analysis", methods=["GET", "POST"])
 def analysis():
-
-    # =========================
-    # DEFAULT VALUES
-    # =========================
     result = None
     predictions = None
     table = None
@@ -133,17 +149,9 @@ def analysis():
 
     selected_file = None
     target_column = None
-
-    # =========================
-    # GET ALL FILES
-    # =========================
     files = os.listdir("outputs")
 
-    # =========================
-    # FORM SUBMISSION
-    # =========================
     if request.method == "POST":
-
         # Selected dataset
         selected_file = request.form.get("dataset")
 
@@ -153,11 +161,7 @@ def analysis():
             None
         )
 
-        # =========================
-        # VALIDATION
-        # =========================
         if selected_file:
-
             # File path
             path = os.path.join(
                 "outputs",
@@ -183,9 +187,6 @@ def analysis():
                     .lower()
                 )
 
-            # =========================
-            # DATASET PREVIEW
-            # =========================
             table = df.head().to_html(
                 classes="table table-bordered"
             )
@@ -193,9 +194,6 @@ def analysis():
             # Column list
             columns = df.columns.tolist()
 
-            # =========================
-            # DETECT PROBLEM TYPE
-            # =========================
             result = detect_problem_type(
                 df,
                 target_column
@@ -203,13 +201,8 @@ def analysis():
 
             problem_type = result["problem_type"]
 
-            # =========================
-            # TRAIN MODELS
-            # =========================
             if target_column:
-
                 if problem_type == "Regression":
-
                     predictions = (
                         train_regression_models(
                             df,
@@ -219,7 +212,6 @@ def analysis():
                     )
 
                 elif problem_type == "Classification":
-
                     predictions = (
                         train_classification_models(
                             df,
@@ -229,7 +221,6 @@ def analysis():
                     )
 
                 elif problem_type == "NLP Classification":
-
                     predictions = (
                         train_nlp_models(
                             df,
@@ -238,9 +229,6 @@ def analysis():
                         )
                     )
 
-    # =========================
-    # RETURN TEMPLATE
-    # =========================
     return render_template(
         "analysis.html",
 
