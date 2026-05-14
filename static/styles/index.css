@@ -908,3 +908,8 @@ tbody tr:hover td {
   body { background: #fff; color: #111; }
   .card { border: 1px solid #ddd; box-shadow: none; }
 }
+
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+}

@@ -1,294 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-    <link rel="stylesheet" href="../static//styles/analysis.css">
-    <title>ML Analysis</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ML Model Evaluation | DataScope</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../static/styles/analysis.css">
 </head>
-
 <body>
 
-    <nav>
-      <a href="/">Home</a>
-      <a href="/visualize">Visualize</a>
-      <a href="/analysis">Analysis</a>
+  <!-- Background decoration -->
+  <div class="bg-grid"></div>
+  <div class="bg-orb bg-orb--1"></div>
+  <div class="bg-orb bg-orb--2"></div>
+
+  <!-- ===================================== -->
+  <!-- NAVIGATION -->
+  <!-- ===================================== -->
+
+  <nav class="navbar">
+    <div class="navbar__brand">
+      <span class="navbar__logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+      </span>
+      <span class="navbar__name">
+        <a href="/" class="logo-link">DataScope</a>
+      </span>
+    </div>
+    <div class="navbar__links">
+      <a href="/" class="navbar__link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </a>
+      <a href="/visualize" class="navbar__link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Visualize
+      </a>
+      <a href="/analysis" class="navbar__link navbar__link--active">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Analysis
+      </a>
+    </div>
   </nav>
 
-    <h1>ML Problem Type Detection</h1>
+  <!-- ===================================== -->
+  <!-- MAIN CONTENT -->
+  <!-- ===================================== -->
 
-    <!-- FORM -->
-    <form
-        method="POST"
-        action="/analysis"
-        id="datasetForm"
-    >
+  <main class="main">
 
-        <!-- DATASET -->
-        <label>
-            <strong>Select Dataset:</strong>
-        </label>
+    <header class="page-header">
+      <div class="page-header__eyebrow">Machine Learning</div>
+      <h1 class="page-header__title">ML Problem Type Detection</h1>
+      <p class="page-header__subtitle">Select a dataset and target column to auto-detect the ML problem type and compare models</p>
+    </header>
 
-        <br>
+    <div class="dashboard">
 
-        <select
-            name="dataset"
-            onchange="resetTarget()"
-        >
+      <!-- ===================================== -->
+      <!-- FORM CARD -->
+      <!-- ===================================== -->
 
-            {% for file in files %}
-
-                <option
-                    value="{{ file }}"
-                    {% if file == selected_file %}
-                        selected
-                    {% endif %}
-                >
-                    {{ file }}
-                </option>
-
-            {% endfor %}
-
-        </select>
-
-        <br><br>
-
-        <!-- TARGET COLUMN -->
-        {% if columns %}
-
-            <label>
-                <strong>Select Target Column:</strong>
-            </label>
-
-            <br>
-
-            <select name="target_column">
-
-                <option value="">
-                    No Target Column (Clustering)
-                </option>
-
-                {% for column in columns %}
-
-                    <option
-                        value="{{ column }}"
-                        {% if column == target_column %}
-                            selected
-                        {% endif %}
-                    >
-                        {{ column }}
-                    </option>
-
-                {% endfor %}
-
-            </select>
-
-        {% endif %}
-
-        <br><br>
-
-        <button type="submit">
-            Analyze Dataset
-        </button>
-
-    </form>
-
-    <!-- DATASET PREVIEW -->
-    {% if table %}
-
-        <div class="result-box">
-
-            <h2>Dataset Preview</h2>
-
-            {{ table | safe }}
-
+      <section class="card card--controls">
+        <div class="card__header">
+          <div class="card__icon card__icon--orange">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </div>
+          <h2 class="card__title">Configure Analysis</h2>
         </div>
 
-    {% endif %}
+        <form method="POST" action="/analysis" id="datasetForm" class="analysis-form">
 
-    <!-- ML RESULT -->
-    {% if result %}
+          <div class="form-grid">
 
-        <div class="result-box">
+            <!-- Dataset select -->
+            <div class="form-field">
+              <label class="form-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                Select Dataset
+              </label>
+              <div class="select-wrapper">
+                <select name="dataset" onchange="resetTarget()" class="select-input">
+                  {% for file in files %}
+                    <option value="{{ file }}" {% if file == selected_file %}selected{% endif %}>
+                      {{ file }}
+                    </option>
+                  {% endfor %}
+                </select>
+                <div class="select-arrow">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+              </div>
+            </div>
 
-            <h2>Detected Problem Type</h2>
-
-            <h3>
-                {{ result.problem_type }}
-            </h3>
-
-            {% if result.sub_type %}
-
-                <h4>
-                    {{ result.sub_type }}
-                </h4>
-
+            <!-- Target column select -->
+            {% if columns %}
+            <div class="form-field">
+              <label class="form-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Select Target Column
+              </label>
+              <div class="select-wrapper">
+                <select name="target_column" class="select-input">
+                  <option value="">No Target Column (Clustering)</option>
+                  {% for column in columns %}
+                    <option value="{{ column }}" {% if column == target_column %}selected{% endif %}>
+                      {{ column }}
+                    </option>
+                  {% endfor %}
+                </select>
+                <div class="select-arrow">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+              </div>
+            </div>
             {% endif %}
 
-            <h3>Suggested Algorithms</h3>
+          </div>
 
-            <ul>
+          <button type="submit" class="btn btn--primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            Analyze Dataset
+          </button>
 
-                {% for algo in result.algorithms %}
+        </form>
+      </section>
 
-                    <li>
-                        {{ algo }}
-                    </li>
+      <!-- ===================================== -->
+      <!-- DATASET PREVIEW -->
+      <!-- ===================================== -->
 
-                {% endfor %}
+      {% if table %}
+      <section class="card animate-in">
+        <div class="card__header">
+          <div class="card__icon card__icon--blue">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/>
+              <line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/>
+            </svg>
+          </div>
+          <h2 class="card__title">Dataset Preview</h2>
+          <span class="card__badge">Preview</span>
+        </div>
+        <div class="table-scroll">
+          {{ table | safe }}
+        </div>
+      </section>
+      {% endif %}
 
-            </ul>
+      <!-- ===================================== -->
+      <!-- ML RESULT — DETECTED PROBLEM TYPE -->
+      <!-- ===================================== -->
+
+      {% if result %}
+      <section class="card card--result animate-in">
+        <div class="card__header">
+          <div class="card__icon card__icon--teal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+          </div>
+          <h2 class="card__title">Detected Problem Type</h2>
+          <span class="card__badge card__badge--teal">Auto-detected</span>
+        </div>
+
+        <div class="result-summary">
+
+          <div class="result-type-block">
+            <span class="result-type-block__label">Problem Type</span>
+            <span class="result-type-block__value">{{ result.problem_type }}</span>
+          </div>
+
+          {% if result.sub_type %}
+          <div class="result-type-block result-type-block--sub">
+            <span class="result-type-block__label">Sub-type</span>
+            <span class="result-type-block__value result-type-block__value--sub">{{ result.sub_type }}</span>
+          </div>
+          {% endif %}
 
         </div>
 
-    {% endif %}
+        <div class="card__divider"></div>
 
-    <!-- MODEL RESULTS -->
-    {% if predictions %}
+        <h4 class="card__subtitle">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          Suggested Algorithms
+        </h4>
 
-        <div class="result-box">
+        <ul class="algo-list">
+          {% for algo in result.algorithms %}
+          <li class="algo-list__item">
+            <span class="algo-list__index">{{ "%02d" % loop.index }}</span>
+            <span class="algo-list__name">{{ algo }}</span>
+            <svg class="algo-list__arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </li>
+          {% endfor %}
+        </ul>
 
-            <h2>Model Comparison</h2>
+      </section>
+      {% endif %}
 
-            {% for prediction in predictions %}
+      <!-- ===================================== -->
+      <!-- MODEL COMPARISON -->
+      <!-- ===================================== -->
 
-                <div class="model-card">
-
-                    <h3>
-                        {{ prediction["Model"] }}
-                    </h3>
-
-                    <!-- REGRESSION -->
-                    {% if prediction["RMSE"] is defined %}
-
-                        <p>
-                            <strong>RMSE:</strong>
-                            {{ prediction["RMSE"] }}
-                        </p>
-
-                    {% endif %}
-
-                    {% if prediction["R2 Score"] is defined %}
-
-                        <p>
-                            <strong>R2 Score:</strong>
-                            {{ prediction["R2 Score"] }}
-                        </p>
-
-                    {% endif %}
-
-                    <!-- CLASSIFICATION -->
-                    {% if prediction["Accuracy"] is defined %}
-
-                        <p>
-                            <strong>Accuracy:</strong>
-                            {{ prediction["Accuracy"] }}%
-                        </p>
-
-                    {% endif %}
-
-                    {% if prediction["Precision"] is defined %}
-
-                        <p>
-                            <strong>Precision:</strong>
-                            {{ prediction["Precision"] }}
-                        </p>
-
-                    {% endif %}
-
-                    {% if prediction["Recall"] is defined %}
-
-                        <p>
-                            <strong>Recall:</strong>
-                            {{ prediction["Recall"] }}
-                        </p>
-
-                    {% endif %}
-
-                    {% if prediction["F1 Score"] is defined %}
-
-                        <p>
-                            <strong>F1 Score:</strong>
-                            {{ prediction["F1 Score"] }}
-                        </p>
-
-                    {% endif %}
-
-                </div>
-
-            {% endfor %}
-
+      {% if predictions %}
+      <section class="card animate-in">
+        <div class="card__header">
+          <div class="card__icon card__icon--purple">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </div>
+          <h2 class="card__title">Model Comparison</h2>
+          <span class="card__badge card__badge--purple">{{ predictions | length }} model{% if predictions | length != 1 %}s{% endif %}</span>
         </div>
 
-    {% endif %}
+        <div class="model-grid">
+          {% for prediction in predictions %}
+          <div class="model-card animate-in" style="animation-delay: {{ loop.index0 * 70 }}ms">
 
-    <!-- BEST MODEL -->
-    {% if best_model %}
+            <div class="model-card__header">
+              <span class="model-card__index">M{{ "%02d" % loop.index }}</span>
+              <h3 class="model-card__name">{{ prediction["Model"] }}</h3>
+            </div>
 
-        <div class="result-box best-model">
+            <div class="model-card__metrics">
 
-            <h2>Best Model</h2>
+              <!-- Regression metrics -->
+              {% if prediction["RMSE"] is defined %}
+              <div class="metric">
+                <span class="metric__label">RMSE</span>
+                <span class="metric__value">{{ prediction["RMSE"] }}</span>
+              </div>
+              {% endif %}
 
-            <h3>
-                {{ best_model["Model"] }}
-            </h3>
+              {% if prediction["R2 Score"] is defined %}
+              <div class="metric">
+                <span class="metric__label">R² Score</span>
+                <span class="metric__value metric__value--highlight">{{ prediction["R2 Score"] }}</span>
+              </div>
+              {% endif %}
+
+              <!-- Classification metrics -->
+              {% if prediction["Accuracy"] is defined %}
+              <div class="metric">
+                <span class="metric__label">Accuracy</span>
+                <span class="metric__value metric__value--highlight">{{ prediction["Accuracy"] }}%</span>
+              </div>
+              {% endif %}
+
+              {% if prediction["Precision"] is defined %}
+              <div class="metric">
+                <span class="metric__label">Precision</span>
+                <span class="metric__value">{{ prediction["Precision"] }}</span>
+              </div>
+              {% endif %}
+
+              {% if prediction["Recall"] is defined %}
+              <div class="metric">
+                <span class="metric__label">Recall</span>
+                <span class="metric__value">{{ prediction["Recall"] }}</span>
+              </div>
+              {% endif %}
+
+              {% if prediction["F1 Score"] is defined %}
+              <div class="metric">
+                <span class="metric__label">F1 Score</span>
+                <span class="metric__value">{{ prediction["F1 Score"] }}</span>
+              </div>
+              {% endif %}
+
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+      </section>
+      {% endif %}
+
+      <!-- ===================================== -->
+      <!-- BEST MODEL -->
+      <!-- ===================================== -->
+
+      {% if best_model %}
+      <section class="card card--best animate-in">
+
+        <div class="card__header">
+          <div class="card__icon card__icon--orange">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <h2 class="card__title">Best Model</h2>
+          <span class="card__badge card__badge--orange">Top Performer</span>
+        </div>
+
+        <div class="best-model">
+
+          <div class="best-model__name-row">
+            <span class="best-model__trophy">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+            </span>
+            <h3 class="best-model__name">{{ best_model["Model"] }}</h3>
+          </div>
+
+          <div class="best-model__metrics">
 
             {% if best_model["RMSE"] is defined %}
-
-                <p>
-                    <strong>RMSE:</strong>
-                    {{ best_model["RMSE"] }}
-                </p>
-
+            <div class="metric metric--large">
+              <span class="metric__label">RMSE</span>
+              <span class="metric__value">{{ best_model["RMSE"] }}</span>
+            </div>
             {% endif %}
 
             {% if best_model["R2 Score"] is defined %}
-
-                <p>
-                    <strong>R2 Score:</strong>
-                    {{ best_model["R2 Score"] }}
-                </p>
-
+            <div class="metric metric--large">
+              <span class="metric__label">R² Score</span>
+              <span class="metric__value metric__value--gold">{{ best_model["R2 Score"] }}</span>
+            </div>
             {% endif %}
 
             {% if best_model["Accuracy"] is defined %}
-
-                <p>
-                    <strong>Accuracy:</strong>
-                    {{ best_model["Accuracy"] }}
-                </p>
-
+            <div class="metric metric--large">
+              <span class="metric__label">Accuracy</span>
+              <span class="metric__value metric__value--gold">{{ best_model["Accuracy"] }}</span>
+            </div>
             {% endif %}
 
+          </div>
         </div>
 
-    {% endif %}
+      </section>
+      {% endif %}
 
-    <script>
+    </div>
+  </main>
 
-        function resetTarget() {
+  <!-- ===================================== -->
+  <!-- JAVASCRIPT -->
+  <!-- ===================================== -->
 
-            const targetDropdown =
-                document.querySelector(
-                    'select[name="target_column"]'
-                );
+  <script>
+    function resetTarget() {
+      const targetDropdown = document.querySelector('select[name="target_column"]');
+      if (targetDropdown) targetDropdown.selectedIndex = 0;
+    }
 
-            if (targetDropdown) {
-
-                targetDropdown.selectedIndex = 0;
-
-            }
-
-        }
-
-    </script>
+    // Scroll-animate
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add("animate-in--visible");
+      }),
+      { threshold: 0.08 }
+    );
+    document.querySelectorAll(".animate-in").forEach(el => observer.observe(el));
+  </script>
 
 </body>
-
 </html>
